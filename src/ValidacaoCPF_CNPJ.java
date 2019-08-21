@@ -16,6 +16,9 @@ public class ValidacaoCPF_CNPJ {
 		JSONObject retCodeSuccess = new JSONObject();
 		retCodeSuccess.put("retcode", "SUCCESS");
 		retCodeSuccess.put("tipo", "");
+		retCodeSuccess.put("raiz", "");
+		retCodeSuccess.put("filial", "");
+		retCodeSuccess.put("dc", "");
 		retCodeSuccess.put("valor", "");
 
 		String string_cnpj_cpf = executeSplit(cnpj_cpf);
@@ -30,13 +33,22 @@ public class ValidacaoCPF_CNPJ {
 		String tmp = checkCnpjCpf(string_cnpj_cpf);
 		String retCode = "";
 		
+
+		
 		if(tmp.equals("CNPJ")){
+			String raiz = string_cnpj_cpf.substring(0,8);
+			String filial = string_cnpj_cpf.substring(8,12);
+			String dc = string_cnpj_cpf.substring(12,14);
 			
 			retCode = checkIfValidCnpj(string_cnpj_cpf);
 			
 			if(retCode.equals("SUCCESS")) {
 				retCodeSuccess.put("tipo", "CNPJ");
 				retCodeSuccess.put("valor", string_cnpj_cpf);
+				retCodeSuccess.put("raiz", raiz);
+				retCodeSuccess.put("filial", filial);
+				retCodeSuccess.put("dc", dc);
+
 				return retCodeSuccess;	
 			}
 			else {
@@ -47,11 +59,17 @@ public class ValidacaoCPF_CNPJ {
 
 		}
 		else if(tmp.equals("CPF")){
+			String raiz = string_cnpj_cpf.substring(0,9);
+			String dc = string_cnpj_cpf.substring(9,11);
 			retCode = checkIfValidCpf(string_cnpj_cpf);
 			
 			if(retCode.equals("SUCCESS")) {
 				retCodeSuccess.put("tipo", "CPF");
 				retCodeSuccess.put("valor", string_cnpj_cpf);
+				retCodeSuccess.put("raiz", raiz);
+				retCodeSuccess.put("filial", "");
+				retCodeSuccess.put("dc", dc);
+
 				return retCodeSuccess;				
 		} else {
 			retCodeError.put("descricao", "CPF inválido");
@@ -125,7 +143,9 @@ public class ValidacaoCPF_CNPJ {
 	private static String checkIfValidCnpj(String string_cnpj_cpf) {
 
 		if (validaCnpj(string_cnpj_cpf)) {
+
 			return "SUCCESS";
+			
 		}
 		return "ERRO";
 	}
@@ -182,7 +202,11 @@ public class ValidacaoCPF_CNPJ {
 		} catch (InputMismatchException erro) {
 			return false;
 		}
+		
+		
+
 	}
+	
 
 	private static String checkCnpjCpf(String string_cnpj_cpf) {
 
