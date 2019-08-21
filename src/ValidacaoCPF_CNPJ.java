@@ -1,33 +1,67 @@
 import java.util.InputMismatchException;
 
+import org.json.JSONObject;
+
 public class ValidacaoCPF_CNPJ {
 
 	private final static int CNPJ_SIZE = 14;
 	private final static int CPF_SIZE = 11;
 
-	public static String execute(String cnpj_cpf) {
+	public static JSONObject execute(String cnpj_cpf) {
 
-		String retCode = "erro";
+		JSONObject retCodeError = new JSONObject();
+		retCodeError.put("retcode", "ERROR");
+		retCodeError.put("descricao", "");
+		
+		JSONObject retCodeSuccess = new JSONObject();
+		retCodeSuccess.put("retcode", "SUCCESS");
+		retCodeSuccess.put("tipo", "");
+		retCodeSuccess.put("valor", "");
 
 		String string_cnpj_cpf = executeSplit(cnpj_cpf);
 
 		boolean soNumeros = isOnlyNumbers(string_cnpj_cpf);
 
 		if (!soNumeros) {
-			return retCode;
+			retCodeError.put("descricao", "Não possui apenas números");
+			return retCodeError;
 		}
 
-		switch (checkCnpjCpf(string_cnpj_cpf)) {
-		case "CNPJ":
+		String tmp = checkCnpjCpf(string_cnpj_cpf);
+		String retCode = "";
+		
+		if(tmp.equals("CNPJ")){
+			
 			retCode = checkIfValidCnpj(string_cnpj_cpf);
-			break;
+			
+			if(retCode.equals("SUCCESS")) {
+				retCodeSuccess.put("tipo", "CNPJ");
+				retCodeSuccess.put("valor", string_cnpj_cpf);
+				return retCodeSuccess;	
+			}
+			else {
+				retCodeError.put("descricao", "CNPJ inválido");
+				return retCodeError;
+				
+			}
 
-		case "CPF":
-			retCode = checkIfValidCpf(string_cnpj_cpf);
-			break;
 		}
-
-		return retCode;
+		else if(tmp.equals("CPF")){
+			retCode = checkIfValidCpf(string_cnpj_cpf);
+			
+			if(retCode.equals("SUCCESS")) {
+				retCodeSuccess.put("tipo", "CPF");
+				retCodeSuccess.put("valor", string_cnpj_cpf);
+				return retCodeSuccess;				
+		} else {
+			retCodeError.put("descricao", "CPF inválido");
+			return retCodeError;		
+			}
+		}
+		else {
+			retCodeError.put("descricao", "Número de caracteres inválido");
+			return retCodeError;	
+		}
 	}
 
 	private static String checkIfValidCpf(String string_cnpj_cpf) {
@@ -93,7 +127,6 @@ public class ValidacaoCPF_CNPJ {
 		if (validaCnpj(string_cnpj_cpf)) {
 			return "SUCCESS";
 		}
-
 		return "ERRO";
 	}
 
@@ -158,7 +191,6 @@ public class ValidacaoCPF_CNPJ {
 		else if (string_cnpj_cpf.length() == CPF_SIZE)
 			return "CPF";
 		else
-			System.out.println("Número de caracteres inválido");
 		return "INVALID";
 
 	}
@@ -171,9 +203,9 @@ public class ValidacaoCPF_CNPJ {
 	private static String executeSplit(String cnpj_cpf) {
 
 		String output_cnpj_cpf = cnpj_cpf.replaceAll("[^0-9]+", "");
-		System.out.println(output_cnpj_cpf);
-
+	
 		return output_cnpj_cpf;
 	}
+	
 
 }
